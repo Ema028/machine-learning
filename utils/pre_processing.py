@@ -31,3 +31,15 @@ def one_hot_heatmap(df):
 	sns.heatmap(df_encoded.corr(), cmap='coolwarm', center=0)
 	plt.title("Matriz de correlação com variáveis categóricas")
 	plt.show()
+
+def capping_outliers(df, coluna):
+	df = df.copy()
+	q1 = df[coluna].quantile(0.25)
+	q3 = df[coluna].quantile(0.75)
+	iqr = q3 - q1
+
+	limite_inferior = q1 - 1.5 * iqr
+	limite_superior = q3 + 1.5 * iqr
+	df[coluna] = df[coluna].clip(limite_inferior, limite_superior)
+	#retorna novo dataframe com outliers limitados pelo IQR
+	return df
