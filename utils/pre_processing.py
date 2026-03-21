@@ -2,10 +2,15 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 class Dataframe:
 	def __init__(self, df):
 		self.df = df
+		self.X_train = None
+		self.X_test = None
+		self.y_train = None
+		self.y_test = None
 
 	def print_missing(self):
 		missing = self.df.isnull().sum()
@@ -52,3 +57,12 @@ class Dataframe:
 	def apply_log(self, columns):
 		for col in columns:
 			self.df[col] = np.log1p(self.df[col]) #log +1 para caso de 0
+
+	#dividir base em conjuntos de treino (por default 80%) e teste (por default 20%)
+	def separar_base(self, target_column, test_size=0.2, random_state=42):
+		x = self.df.drop(columns=[target_column]) #x é todas as variáveis menos target
+		y = self.df[target_column] #y é target
+
+		self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+			x, y, test_size=test_size, random_state=random_state
+		)
