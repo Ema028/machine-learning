@@ -9,7 +9,7 @@ print(df.describe().T)
 '''Valor_Aluguel, Valor_Condominio e Metragem, talvez outliers, pois Q3 muito diferente do valor máximo
 variáveis quantitativas (quartos, banheiros, suítes e vagas) com máximos altos, 
 mas faz sentido para imóveis de alto padrão'''
-'''
+
 sns.histplot(df['Valor_Aluguel'], bins=30)
 plt.title("Distribuição de preço do aluguel")
 plt.show()
@@ -24,7 +24,7 @@ sns.histplot(df['Metragem'], bins=30)
 plt.title("Distribuição de metragem do imóvel")
 plt.show()
 #cauda longa também, distorção, mas menos que as outras
-'''
+
 '''tentei tratamento com capping pelo IQR, mas fez um teto artificial e para não remover dados usei transformação logarítmica
 para encolher os outliers, não enviesar o modelo'''
 data.apply_log(['Valor_Condominio', 'Valor_Aluguel', 'Metragem'])
@@ -68,6 +68,7 @@ data.separar_base('Valor_Aluguel')
 
 X = data.X_train[['Metragem']]  # Variável independente (características)
 y = data.y_train  # Variável dependente (rótulo)
+print("\nmodelo de regressão simples:")
 regressao_simples = LinearRegression()
 regressao_simples.fit(X, y)
 
@@ -86,4 +87,44 @@ print(f"R² do modelo de treinamento: {r2_treino:.4f}")
 '''
 O R² de ~0.52 indica que a metragem sozinha explica cerca de 52% da variação do aluguel, é um resultado ok, mas mostra 
 que o aluguel é influenciado por muitos outros fatores
+'''
+
+sns.scatterplot(x=X['Metragem'], y=y, alpha=0.5, label='Dados Reais')
+plt.plot(X['Metragem'], regressao_simples.predict(X), color='red', linewidth=2, label='Reta de Regressão')
+plt.title("Reta de Regressão: Aluguel vs Metragem")
+plt.xlabel("Metragem")
+plt.ylabel("Valor Aluguel")
+plt.legend()
+plt.show()
+'''
+reta passa no meio da nuvem, modelo capturou a tendência central, segue a tendência
+muitos pontos distantes da reta, dispersão, explica R² não próximo de 1
+dispersão dos pontos parece constante ao longo da reta, transformação logarítmica fez sentido
+'''
+
+X_test = data.X_test[['Metragem']]
+y_test = data.y_test
+
+previsoes_simples = regressao_simples.predict(X_test)
+r2 = regressao_simples.score(X_test, y_test)
+print("Coeficiente de Determinação (R²) nos Dados de Teste:", r2)
+'''
+R² de ~0.57 no teste, próximo do valor de treino, modelo não está superajustado, metragem sozinha explica apenas 
+pouco mais da metade da variação do aluguel
+'''
+
+print("\nmodelo de regressão múltipla:")
+regressao_multi = LinearRegression()
+regressao_multi.fit(data.X_train, data.y_train)
+
+r2_treino = regressao_multi.score(data.X_train, data.y_train)
+print(f"R² do modelo de treinamento: {r2_treino:.4f}")
+
+previsoes_multi = regressao_multi.predict(data.X_test)
+r2 = regressao_multi.score(data.X_test, data.y_test)
+print("Coeficiente de Determinação (R²) nos Dados de Teste:", r2)
+'''
+O modelo de Regressão Múltipla é mais preciso, R² de ~0.64 no teste vs ~0.57 do modelo simples,
+ocorre porque o valor do aluguel tem correlação forte com outras variáveis também,
+que o modelo simples ignorava, incluir elas, reduz o erro residual
 '''
