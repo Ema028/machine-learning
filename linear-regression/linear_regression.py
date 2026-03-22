@@ -1,7 +1,7 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LinearRegression
 
-df = pd.read_csv("data/aluguel.csv", delimiter=';')
+df = pd.read_csv("../data/aluguel.csv", delimiter=';')
 print(df.info())  #apenas variáveis numéricas
 data = Dataframe(df)
 data.print_missing() #sem valor faltando
