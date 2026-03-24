@@ -66,3 +66,37 @@ class Dataframe:
 		self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
 			x, y, test_size=test_size, random_state=random_state
 		)
+
+def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
+	print(f"X_treino: {X_treino.shape[0]} linhas | {X_treino.shape[1]} colunas")
+	print(f"y_treino: {y_treino.shape[0]} linhas | {y_treino.shape[1]} colunas")
+	print(f"X_teste:  {X_teste.shape[0]} linhas | {X_teste.shape[1]} colunas")
+	print(f"y_teste:  {y_teste.shape[0]} linhas | {y_teste.shape[1]} colunas\n")
+
+	if X_treino.shape[0] != y_treino.shape[0]:
+		print("Número de linhas diferente entre X_treino e y_treino!")
+	if X_teste.shape[0] != y_teste.shape[0]:
+		print("Número de linhas diferente entre X_teste e y_teste!\n")
+
+	if list(X_treino.columns) != list(X_teste.columns):
+		print("As colunas de X_treino e X_teste são diferentes ou estão em ordem errada!")
+	else:
+		print("X_treino e X_teste possuem as mesmas colunas.")
+
+	# verifica se o y tem apenas a coluna alvo
+	print(f"Colunas em y_treino: {y_treino.columns.tolist()}")
+	if target_column not in X_treino.columns:
+		print("Sucesso: A base X não tem a coluna alvo.\n")
+
+	# porcentagem de cada classe na base de teste e treino, deve estar balanceado em treino e desbalanceado em teste
+	proporcao_teste = y_teste.value_counts(normalize=True) * 100
+	proporcao_treino = y_treino.value_counts(normalize=True) * 100
+	print(proporcao_teste.apply(lambda x: f"{x:.2f}%"))
+	print(proporcao_treino.apply(lambda x: f"{x:.2f}%\n"))
+
+	nulos_treino = X_treino.isnull().sum().sum()
+	nulos_teste = X_teste.isnull().sum().sum()
+	if nulos_treino > 0 or nulos_teste > 0:
+		print(f"Ainda há dados nulos nas bases tratadas! (Treino: {nulos_treino}, Teste: {nulos_teste})")
+	else:
+		print("Nenhum valor nulo encontrado nas bases.")

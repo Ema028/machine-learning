@@ -3,9 +3,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
+from utils.pre_processing import verificar_base
 
 '''
-Descrição do Projeto: construção de um modelo de Machine Learning para prever se um cliente terá uma pontuação de crédito,
+Descrição do Projeto: construção de um modelo de Machine Learning para prever se um cliente terá uma pontuação de crédito alta,
 indentificando impulsionadores do limite de crédito. Os dados foram limpos, 
 transformados, balanceados e padronizados em https://github.com/Ema028/applied-analytics-cases/tree/master/analise_credit_score.
 O objetivo principal ao aplicar o algoritmo de Naive Bayes é testar como 
@@ -16,20 +17,7 @@ X_treino = pd.read_csv('../data/base_credito_tratada/X_train.csv')
 y_treino = pd.read_csv('../data/base_credito_tratada/y_train.csv')
 X_teste = pd.read_csv('../data/base_credito_tratada/X_test.csv')
 y_teste = pd.read_csv('../data/base_credito_tratada/y_test.csv')
-
-print(f"X treino: {X_treino.shape[0]} linhas | y treino: {y_treino.shape[0]} linhas")
-print(f"X teste: {X_teste.shape[0]} linhas | y teste: {y_teste.shape[0]} linhas\n")
-
-#verifica se o y tem apenas a coluna alvo
-print(f"Colunas em y_treino: {y_treino.columns.tolist()}")
-#print(f"Colunas em X_treino: {X_treino.columns.tolist()}")
-#print(f"Colunas em X_teste: {X_teste.columns.tolist()}")
-if 'Credit Score_High' not in X_treino.columns:
-    print("Sucesso: A base X não tem a coluna alvo.\n")
-
-#porcentagem de cada classe na base de teste, ver se y está balanceado
-proporcao_teste = y_teste.value_counts(normalize=True) * 100
-print(proporcao_teste.apply(lambda x: f"{x:.2f}%"))
+verificar_base(X_treino, X_teste, y_treino, y_teste,  'Credit Score_High')
 
 naive_bayes = GaussianNB()
 #.values.ravel() usado para evitar warnings do pandas, garantir que o y seja um array unidimensional
