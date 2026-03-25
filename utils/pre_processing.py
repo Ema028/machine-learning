@@ -3,6 +3,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import SMOTE
 
 class Dataframe:
 	def __init__(self, df):
@@ -67,6 +69,24 @@ class Dataframe:
 			x, y, test_size=test_size, random_state=random_state
 		)
 
+	def smote(self):
+		smote = SMOTE(random_state=42)
+		self.X_train, self.y_train = smote.fit_resample(self.X_train, self.y_train)
+
+		print(self.y_train.value_counts())
+		print("\nDepois do SMOTE:\n")
+		print(self.y_train.value_counts())
+
+	def std_scaler(self):
+		scaler = StandardScaler()
+
+		self.X_train = scaler.fit_transform(self.X_train)
+		self.X_test = scaler.transform(self.X_test)
+
+		self.X_train = pd.DataFrame(self.X_train, columns=self.X_train.columns)
+		self.X_test = pd.DataFrame(self.X_test, columns=self.X_test.columns)
+
+
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 	print(f"X_treino: {X_treino.shape[0]} linhas | {X_treino.shape[1]} colunas")
 	print(f"y_treino: {y_treino.shape[0]} linhas | {y_treino.shape[1]} colunas")
@@ -87,6 +107,8 @@ def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 	print(f"Colunas em y_treino: {y_treino.columns.tolist()}")
 	if target_column not in X_treino.columns:
 		print("Sucesso: A base X não tem a coluna alvo.\n")
+	print(f"Colunas em X_treino: {X_treino.columns.tolist()}")
+	print(f"Colunas em X_teste: {X_teste.columns.tolist()}\n")
 
 	# porcentagem de cada classe na base de teste e treino, deve estar balanceado em treino e desbalanceado em teste
 	proporcao_teste = y_teste.value_counts(normalize=True) * 100
