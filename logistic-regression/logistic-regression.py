@@ -1,6 +1,6 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, roc_auc_score
 
 #o objetivo é construir um modelo de regressão capaz de indicar se novos pacientes estão propensos a doenças cariovasculares
 df = pd.read_csv("../data/cardio.csv", delimiter=';')
@@ -55,16 +55,53 @@ df_coef = pd.DataFrame({
 })
 df_coef = df_coef.sort_values(by='Coeficiente', ascending=False)
 print(df_coef.to_string(index=False))
-print("\n")
+'''smoke e gluc ficaram com pesos negativos, variável de confusão, 
+os fumantes da base podem ser mais jovens ou magros e isso ter mascarado o efeito do cigarro'''
 
 previsoes = log_reg.predict(data.X_test)
 acuracia = accuracy_score(data.y_test, previsoes)
-print(f"Acurácia do Modelo: {acuracia * 100:.2f}%\n")
+print(f"\nAcurácia do Modelo: {acuracia * 100:.2f}%\n")
 print(classification_report(data.y_test, previsoes))
+'''acurácia de ~62%, um pouco melhor que um chute a sorte, 
+precisão de 63%, o seu modelo acerta 63% das vezes quando diz que uma pessoa está doente, ou seja, 37% de falsos positivos
+recall de 58%, o modelo só conseguiu detectar 58% dos doentes da base, ou seja, 42% de falsos negativos
+em um cenário médico real seria perigoso'''
 
-'''
-regressão logística prevê a probabilidade de um evento ocorrer, pega os dados e mapeia entre 0 e 1 e 
+previsoes_proba = log_reg.predict_proba(data.X_test)[:, 1] #probabilidades dos doentes
+plt.figure(figsize=(8, 6))
+
+fpr, tpr, thresholds = roc_curve(data.y_test, previsoes_proba)
+auc_score = roc_auc_score(data.y_test, previsoes_proba)
+
+plt.plot(fpr, tpr, color='blue', lw=2, label=f'Curva ROC (área = {auc_score:.2f})')
+#linha de referência do chute aleatório
+plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Taxa de Falsos Positivos')
+plt.ylabel('Taxa de Verdadeiros Positivos')
+plt.title('Curva ROC')
+plt.legend(loc="lower right")
+plt.grid(True)
+plt.show()
+'''curva mostra a relação entre acertos reais e alarmes falsos,
+área de 0.68 indica que o modelo tem 68% de chance de distinguir doentes e saudáveis,
+acima da linha vermelha, um pouco melhor que acaso, mas não tem muito poder preditivo'''
+
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(data.y_test, previsoes)
+class_names = ['Saudável', 'Doente']
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+            xticklabels=class_names,
+            yticklabels=class_names)
+
+plt.title('Matriz de Confusão')
+plt.ylabel('Valor Real')
+plt.xlabel('Previsão')
+plt.show()
+
+'''regressão logística prevê a probabilidade de um evento ocorrer, pega os dados e mapeia entre 0 e 1 e 
 usa essa probabilidade para categorizar os dados em classes(modelo de classificação)
 assim como a linear calcula coeficientes para cada variável e um intercepto formando uma equação linear simples, 
-a diferença é que a logística aplica a função sigmoide no resultado da equação
-'''
+a diferença é que a logística aplica a função sigmoide no resultado da equação'''
