@@ -68,16 +68,13 @@ class Dataframe:
 		plt.show()
 
 	def capping_outliers(self, coluna):
-		df = self.df.copy()
-		q1 = df[coluna].quantile(0.25)
-		q3 = df[coluna].quantile(0.75)
+		q1 = self.df[coluna].quantile(0.25)
+		q3 = self.df[coluna].quantile(0.75)
 		iqr = q3 - q1
 
 		limite_inferior = q1 - 1.5 * iqr
 		limite_superior = q3 + 1.5 * iqr
-		df[coluna] = df[coluna].clip(limite_inferior, limite_superior)
-		#retorna novo dataframe com outliers limitados pelo IQR
-		return self.df
+		self.df[coluna] = self.df[coluna].clip(limite_inferior, limite_superior)
 
 	def apply_log(self, columns):
 		for col in columns:
@@ -111,10 +108,14 @@ class Dataframe:
 
 
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
+	#se y for series do pandas, tem 1 coluna
+	y_treino_cols = 1 if len(y_treino.shape) == 1 else y_treino.shape[1]
+	y_teste_cols = 1 if len(y_teste.shape) == 1 else y_teste.shape[1]
+
 	print(f"X_treino: {X_treino.shape[0]} linhas | {X_treino.shape[1]} colunas")
-	print(f"y_treino: {y_treino.shape[0]} linhas | {y_treino.shape[1]} colunas")
+	print(f"y_treino: {y_treino.shape[0]} linhas | {y_treino_cols} colunas")
 	print(f"X_teste:  {X_teste.shape[0]} linhas | {X_teste.shape[1]} colunas")
-	print(f"y_teste:  {y_teste.shape[0]} linhas | {y_teste.shape[1]} colunas\n")
+	print(f"y_teste:  {y_teste.shape[0]} linhas | {y_teste_cols} colunas\n")
 
 	if X_treino.shape[0] != y_treino.shape[0]:
 		print("Número de linhas diferente entre X_treino e y_treino!")
@@ -127,7 +128,8 @@ def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 		print("X_treino e X_teste possuem as mesmas colunas.")
 
 	# verifica se o y tem apenas a coluna alvo
-	print(f"Colunas em y_treino: {y_treino.columns.tolist()}")
+	nome_y = y_treino.name if isinstance(y_treino, pd.Series) else y_treino.columns.tolist()
+	print(f"Colunas em y_treino: {nome_y}")
 	if target_column not in X_treino.columns:
 		print("Sucesso: A base X não tem a coluna alvo.\n")
 	print(f"Colunas em X_treino: {X_treino.columns.tolist()}")
