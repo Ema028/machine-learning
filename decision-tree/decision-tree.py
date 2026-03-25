@@ -20,6 +20,7 @@ y_treino = pd.read_csv('../data/base_credito_tratada/y_train.csv')
 X_teste = pd.read_csv('../data/base_credito_tratada/X_test.csv')
 y_teste = pd.read_csv('../data/base_credito_tratada/y_test.csv')
 verificar_base(X_treino, X_teste, y_treino, y_teste,  'Credit Score_High')
+#nada que denuncie a variável alvo vazou para X_teste nem X_treino
 
 ''' 
 para aplicar o algoritmo de árvore de decisão,treinamos o modelo com os dados de treino 
@@ -50,7 +51,7 @@ scores = cross_val_score(arvore_decisao, X_total, y_total.values.ravel(), cv=5)
 print(f"Acurácias obtidas em cada uma das 5 rodadas: {np.round(scores * 100, 2)}%")
 print(f"Acurácia média: {scores.mean() * 100:.2f}%")
 
-#a acurácia foi 100% tanto na base de treino quanto de teste, por ser igual não parece ser um caso de overfitting
+#como a acurácia foi igual tanto na base de treino quanto de teste, não parece ser um caso de overfitting
 
 class_names = ['Crédito não alto', 'Crédito alto']
 plt.figure(figsize=(12, 8))
@@ -115,7 +116,8 @@ plt.title('Matriz de Confusão reduzida')
 plt.show()
 
 #a acurácia diminuiu um pouco, sendo ~94% na base de teste, enquanto no modelo original foi 100%, mas a árvore é visivelmente menor
-#o desempenho da árvore reduzida foi bem melhor, bem mais simples, errando só 2 amostras em 33
+#o desempenho da árvore reduzida foi melhor considerando a simplicidade, errando só 2 amostras em 33
+#mas a reduzida teve queda de desempenho no recall, tendo 9% de falsos positivos no teste
 
 '''
 na validação, naive bayes obteve ~97% de acurácia, a árvore atingiu aproximadamente 99% na validação cruzada, indica boa capacidade de generalização
