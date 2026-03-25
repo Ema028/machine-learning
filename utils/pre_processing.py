@@ -43,6 +43,14 @@ class Dataframe:
 		plt.ylabel(axis_y)
 		plt.show()
 
+	def box_plot(self, axis_x, axis_y, title, x = 12, y = 8):
+		plt.figure(figsize=(x, y))
+		sns.boxplot(x=axis_x, y=axis_y, data=self.df)
+		plt.title(title)
+		plt.xlabel(axis_x)
+		plt.ylabel(axis_y)
+		plt.show()
+
 	def heatmap(self, x = 12, y = 8):
 		plt.figure(figsize=(x, y))
 		sns.heatmap(self.df.corr(numeric_only=True), annot=True, cmap='coolwarm', fmt='.2f')
