@@ -1,4 +1,6 @@
 from utils.pre_processing import *
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 #o objetivo é construir um modelo de regressão capaz de indicar se novos pacientes estão propensos a doenças cariovasculares
 df = pd.read_csv("../data/cardio.csv", delimiter=';')
@@ -38,3 +40,31 @@ data.box_plot('cardio_disease', 'weight', "Doenças Cardíacas por peso")
 data.separar_base('cardio_disease')
 data.std_scaler() #regressão logística é sensível à escala das variáveis, padronizar garante que variáveis com valores altos não dominem o modelo
 verificar_base(data.X_train, data.X_test, data.y_train, data.y_test, 'cardio_disease') #dados já balanceados
+
+log_reg = LogisticRegression(max_iter=1000)
+log_reg.fit(data.X_train, data.y_train)
+
+intercept = log_reg.intercept_[0]
+print(f"\nIntercept: {intercept:.4f}\n")
+
+#peso que o modelo deu para cada variável, com os dados padronizados dá comparar esses valores diretamente
+coeficientes = log_reg.coef_[0]
+df_coef = pd.DataFrame({
+    'Variável': data.X_train.columns,
+    'Coeficiente': coeficientes
+})
+df_coef = df_coef.sort_values(by='Coeficiente', ascending=False)
+print(df_coef.to_string(index=False))
+print("\n")
+
+previsoes = log_reg.predict(data.X_test)
+acuracia = accuracy_score(data.y_test, previsoes)
+print(f"Acurácia do Modelo: {acuracia * 100:.2f}%\n")
+print(classification_report(data.y_test, previsoes))
+
+'''
+regressão logística prevê a probabilidade de um evento ocorrer, pega os dados e mapeia entre 0 e 1 e 
+usa essa probabilidade para categorizar os dados em classes(modelo de classificação)
+assim como a linear calcula coeficientes para cada variável e um intercepto formando uma equação linear simples, 
+a diferença é que a logística aplica a função sigmoide no resultado da equação
+'''
