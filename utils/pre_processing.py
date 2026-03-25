@@ -29,7 +29,22 @@ class Dataframe:
 			print("\n\n")
 			print(self.df[column].value_counts())
 
-	def heatmap(self):
+	def histogram(self, column, title, x = 12, y = 8, bins = 30):
+		plt.figure(figsize=(x, y))
+		sns.histplot(self.df[column], bins=bins)
+		plt.title(title)
+		plt.show()
+
+	def scattergram(self, axis_x, axis_y, title, x = 12, y = 8):
+		plt.figure(figsize=(x, y))
+		sns.scatterplot(x=axis_x, y=axis_y, data=self.df)
+		plt.title(title)
+		plt.xlabel(axis_x)
+		plt.ylabel(axis_y)
+		plt.show()
+
+	def heatmap(self, x = 12, y = 8):
+		plt.figure(figsize=(x, y))
 		sns.heatmap(self.df.corr(numeric_only=True), annot=True, cmap='coolwarm', fmt='.2f')
 		plt.title("Matriz de correlação para variáveis numéricas")
 		plt.show()
