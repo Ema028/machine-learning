@@ -24,6 +24,15 @@ class Dataframe:
 		}).sort_values(by='Missing', ascending=False)
 		print(missing_table[missing_table['Missing'] > 0])
 
+	def drop_missing(self):
+		self.df = self.df.dropna()
+
+	def drop_columns(self, columns):
+		df = self.df.copy()
+		for col in columns:
+			df.drop(columns=['species'])
+		return df
+
 	def print_unique_values(self):
 		for column in self.df.select_dtypes(include='str').columns:
 			print("\n\n")
@@ -51,11 +60,19 @@ class Dataframe:
 		plt.ylabel(axis_y)
 		plt.show()
 
+	def pair_plot(self, hue = None):
+		sns.pairplot(self.df, hue = hue)
+		plt.show()
+
 	def heatmap(self, x = 12, y = 8):
 		plt.figure(figsize=(x, y))
 		sns.heatmap(self.df.corr(numeric_only=True), annot=True, cmap='coolwarm', fmt='.2f')
 		plt.title("Matriz de correlação para variáveis numéricas")
 		plt.show()
+
+	def one_hot(self):
+		cat_cols = self.df.select_dtypes(include=['object', 'str']).columns
+		self.df = pd.get_dummies(self.df, columns=cat_cols, drop_first=True)
 
 	def one_hot_heatmap(self):
 		#one-hot encoding: cria colunas binárias para cada categoria, evita falsa ordem hierárquica como em label encoding
