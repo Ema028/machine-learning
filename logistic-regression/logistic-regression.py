@@ -15,9 +15,8 @@ df.dropna(subset=['weight'], inplace=True)
 
 print(df.describe().T) #height com máximos e mínimos estranhos, recem-nascido de 70cm? e pessoa gigante de 250cm
 data.histogram('height', "distribuição de altura") #eixo x muito esticado, min e max são pontos isolados
-data.capping_outliers('height')
 data.histogram('weight', "distribuição de peso") #cauda muito longa para direita
-data.capping_outliers('weight')
+data.capping_outliers(['weight', 'height'])
 
 data.heatmap()
 #alvo é cardio_disease, variáveis com maior correlação são age e cholesterol, seguidas por weight

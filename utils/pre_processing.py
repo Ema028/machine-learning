@@ -84,14 +84,15 @@ class Dataframe:
 		plt.title("Matriz de correlação com variáveis categóricas")
 		plt.show()
 
-	def capping_outliers(self, coluna):
-		q1 = self.df[coluna].quantile(0.25)
-		q3 = self.df[coluna].quantile(0.75)
-		iqr = q3 - q1
+	def capping_outliers(self, columns):
+		for coluna in columns:
+			q1 = self.df[coluna].quantile(0.25)
+			q3 = self.df[coluna].quantile(0.75)
+			iqr = q3 - q1
 
-		limite_inferior = q1 - 1.5 * iqr
-		limite_superior = q3 + 1.5 * iqr
-		self.df[coluna] = self.df[coluna].clip(limite_inferior, limite_superior)
+			limite_inferior = q1 - 1.5 * iqr
+			limite_superior = q3 + 1.5 * iqr
+			self.df[coluna] = self.df[coluna].clip(limite_inferior, limite_superior)
 
 	def apply_log(self, columns):
 		for col in columns:
