@@ -19,5 +19,34 @@ data.pair_plot()
 #pelo gráfico o id está ordenado por renda, o grafico annual income x spending score indica 5 clusters naturais
 
 scaler = StandardScaler()
-X_original = data.drop_columns(['CustomerID'])
+#'CustomerID' removido por ser só identificador,
+#'Gender' porque distância espacial entre 0 e 1 estava criando um ruído artificial nos grupos de consumo
+#'Age' porque estava desfocando do comportamento financeiro, faz sentido cruzar dados no final
+X_original = data.drop_columns(['CustomerID', 'Gender', 'Age'])
 X_normalizado = pd.DataFrame(scaler.fit_transform(data.df), columns=data.df.columns)
+
+inertia = []
+silhouette_scores = []
+K = range(2, 10)
+
+for k in K:
+    kmeans_temp = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans_temp.fit_predict(X_normalizado)
+    inertia.append(kmeans_temp.inertia_)
+    silhouette_scores.append(silhouette_score(X_normalizado, labels))
+
+plt.figure()
+plt.plot(K, inertia, marker='o')
+plt.xlabel('Número de clusters')
+plt.ylabel('Inertia')
+plt.title('Método de Elbow')
+plt.show()
+#cotovelo claro em 5
+
+plt.figure()
+plt.plot(K, silhouette_scores, marker='o')
+plt.xlabel('Número de clusters')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score')
+plt.show()
+#pico claro em 5
