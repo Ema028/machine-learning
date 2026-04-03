@@ -61,3 +61,64 @@ enquanto o modelo reduzido teve um desempenho muito parecido (~62%)
 o modelo falhou em prever as classes mais raras (3, 4 e 8), zerou o F1-Score nelas, 
 relação direta com o desbalanceamento dos dados (notas 5 e 6 eram ~82% da base)
 algoritmo priorizou acertos nas classes mais frequentes'''
+
+param_grid = {
+    'n_estimators': [50, 100, 200],            #n_arvores
+    'max_depth': [None, 10, 20, 30],           #profundidade máxima
+    'min_samples_split': [2, 5, 10],           #mínimo de amostras para dividir um nó
+    'min_samples_leaf': [1, 2, 4],             #mínimo de amostras em nó folha
+    'max_features': ['sqrt', 'log2', None]     #n_caracteristicas
+}
+
+random_forest_base = RandomForestClassifier(random_state=42)
+#100 combinações aleatórias, 5 folds de validação cruzada
+random_search = RandomizedSearchCV(
+    estimator=random_forest_base,
+    param_distributions=param_grid,
+    n_iter=100,
+    cv=5,
+    verbose=2,          #mostra o progresso no terminal
+    random_state=42,
+    n_jobs=-1           #todos os núcleos do processador para ser mais rápido
+)
+
+random_search.fit(data.X_train, data.y_train)
+melhor_modelo = random_search.best_estimator_
+print(f"\nMelhores Hiperparâmetros: {random_search.best_params_}\n")
+
+y_pred_rs = melhor_modelo.predict(data.X_test)
+print(f"Acurácia depois de Random Search: {accuracy_score(data.y_test, y_pred_rs) * 100:.2f}%\n")
+print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_rs)}")
+'''otimização com Random Search elevou a acurácia de ~64.38% para ~66.25%, F1-Score também teve um leve ganho
+modelo continua com F1-Score igual a 0 para as classes minoritárias
+redefinir o espaço do problema e fazer o balanceamento pode melhorar as previsões'''
+
+#binning para agrupar variáveis contínuas em categorias comportamentais
+bins = [2, 4, 6, 8]
+labels = ['Ruim', 'Médio', 'Bom']
+data.y_train = pd.cut(data.y_train, bins=bins, labels=labels)
+data.y_test = pd.cut(data.y_test, bins=bins, labels=labels)
+
+#balanceando as classes do alvo com amostras sintéticas
+data.smote()
+random_forest_upgrade = RandomForestClassifier(**random_search.best_params_, random_state=42)
+random_forest_upgrade.fit(data.X_train, data.y_train)
+y_pred_upgrade = random_forest_upgrade.predict(data.X_test)
+
+print(f"Acurácia (com Binning + SMOTE): {accuracy_score(data.y_test, y_pred_upgrade) * 100:.2f}%\n")
+print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_upgrade)}")
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(confusion_matrix(data.y_test, y_pred_upgrade), annot=True, fmt='d', cmap='Greens',
+            xticklabels=random_forest_upgrade.classes_,
+            yticklabels=random_forest_upgrade.classes_)
+plt.xlabel('Previsão')
+plt.ylabel('Valor Real')
+plt.title('Matriz de Confusão (Classes Agrupadas)')
+plt.show()
+'''Análise do Modelo Pós-Upgrade 
+acurácia global saltou de ~66% para ~85.9%
+classe 'Ruim', era ignorada pelo modelo (Recall e F1 zerados), agora identifica 45% (Recall 0.45)
+classe 'Bom' atingiu um Recall de 85%, modelo identifica e mantém a maioria dos casos de alta qualidade, F1-Score (0.73)
+classe 'Médio' com performance muito alta(F1-Score 0.91)
+'''
