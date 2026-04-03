@@ -1,5 +1,5 @@
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, adjusted_rand_score
+from sklearn.metrics import silhouette_score
 from utils.pre_processing import *
 
 df = pd.read_csv("../data/mall.csv", delimiter=',')
@@ -76,3 +76,11 @@ print(f"Perfil numérico:\n{perfil_numerico}")
 #quantos homens e mulheres caíram em cada grupo
 perfil_genero = df_resultado.groupby(['Cluster', 'Gender']).size().unstack(fill_value=0)
 print(f"Perfil de gênero:\n{perfil_genero}")
+
+'''
+cluster 0: (Média Renda/Gasto, ~43 anos, +mulheres): foco em custo-benefício
+cluster 1: (Alta Renda/Gasto, ~33 anos): foco em marcas premium e fidelidade
+cluster 2: (Baixa Renda/Alto Gasto, ~25 anos): foco em tendências e parcelamento
+cluster 3: (Alta Renda/Baixo Gasto, ~41 anos): foco em qualidade, exclusividade e restaurantes
+cluster 4: (Baixa Renda/Baixo Gasto, ~45 anos): foco em cupons, liquidações e promoções
+'''
