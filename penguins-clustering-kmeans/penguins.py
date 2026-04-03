@@ -10,26 +10,22 @@ def main():
 
     df.print_missing()  # frações insignificantes
     df.drop_missing()
-    X_original = df.drop_columns(['species'])  # remover alvo
+    X_original = df.drop_columns(['species', 'island', 'sex'])  #remover alvo e categóricas
 
     df.print_unique_values()  # padronizados
     df.pair_plot()
     # em alguns gráficos, principalmente os de profundidade do bico, aparecem três agrupamentos, sugere 3 clusters naturais
 
-    X = X_original.copy()
-    cat_cols = X.select_dtypes(include=['object', 'str']).columns
-    X = pd.get_dummies(X, columns=cat_cols, drop_first=True)
-
-    X = scaler.fit_transform(X)
+    X_normalizado = pd.DataFrame(scaler.fit_transform(df.df), columns=df.df.columns)
     inertia = []
     silhouette_scores = []
     K = range(2, 10)
 
     for k in K:
         kmeans_temp = KMeans(n_clusters=k, random_state=42)
-        labels = kmeans_temp.fit_predict(X)
+        labels = kmeans_temp.fit_predict(X_normalizado)
         inertia.append(kmeans_temp.inertia_)
-        silhouette_scores.append(silhouette_score(X, labels))
+        silhouette_scores.append(silhouette_score(X_normalizado, labels))
 
     plt.figure()
     plt.plot(K, inertia, marker='o')
@@ -37,7 +33,7 @@ def main():
     plt.ylabel('Inertia')
     plt.title('Método de Elbow')
     plt.show()
-    #queda muito forte de 2 pra 4, depois achata
+    #queda brusca de 2 pra 3, depois continua a cair em taxas menores
 
     plt.figure()
     plt.plot(K, silhouette_scores, marker='o')
@@ -45,13 +41,13 @@ def main():
     plt.ylabel('Silhouette Score')
     plt.title('Silhouette Score')
     plt.show()
-    #crescimento até 4, estabilização até 7(aumentar k não melhora muito a separação real)
-    # volta a crescer em 8 provavelmente por over-segmentation
+    #pico em k=2, provavelmente porque os gentoo são muito grandes, cria uma divisão matemática
 
-    #comparar k=3 pela análise exploratória inicial e k=4 pelo equilíbrio entre menor inércio, maior silhouette
-    kmeans(3, X, X_original, penguins)
-    kmeans(4, X, X_original, penguins)
-    #modelo com k=4 apresentou melhor desempenho mesmo com só 3 espécies, provavelmente subestruturas dentro das espécies
+    #comparar k=3 pela análise exploratória inicial, k=2 pelo silhouette e k=4
+    kmeans(3, X_normalizado, X_original, penguins)
+    kmeans(2, X_normalizado, X_original, penguins)
+    kmeans(4, X_normalizado, X_original, penguins)
+    #modelo com k=3 apresentou melhor desempenho
 
 def kmeans(k, X, X_original, penguins):
     kmeans = KMeans(n_clusters=k, random_state=42)
