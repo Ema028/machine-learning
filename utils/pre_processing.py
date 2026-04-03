@@ -28,10 +28,8 @@ class Dataframe:
 		self.df = self.df.dropna()
 
 	def drop_columns(self, columns):
-		df = self.df.copy()
-		for col in columns:
-			df.drop(columns=['species'])
-		return df
+		self.df.drop(columns = columns, inplace=True)
+		return self.df
 
 	def print_unique_values(self):
 		for column in self.df.select_dtypes(include='str').columns:
@@ -73,6 +71,7 @@ class Dataframe:
 	def one_hot(self):
 		cat_cols = self.df.select_dtypes(include=['object', 'str']).columns
 		self.df = pd.get_dummies(self.df, columns=cat_cols, drop_first=True)
+		return self.df
 
 	def one_hot_heatmap(self):
 		#one-hot encoding: cria colunas binárias para cada categoria, evita falsa ordem hierárquica como em label encoding
