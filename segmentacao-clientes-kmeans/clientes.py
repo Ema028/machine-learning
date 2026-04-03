@@ -3,7 +3,7 @@ from sklearn.metrics import silhouette_score, adjusted_rand_score
 from utils.pre_processing import *
 
 df = pd.read_csv("../data/mall.csv", delimiter=',')
-data = Dataframe(df)
+data = Dataframe(df.copy())
 
 print(df.info())
 data.print_missing() #nada faltando
@@ -50,3 +50,29 @@ plt.ylabel('Silhouette Score')
 plt.title('Silhouette Score')
 plt.show()
 #pico claro em 5
+
+kmeans = KMeans(n_clusters=5, random_state=42)
+clusters = kmeans.fit_predict(X_normalizado)
+centroids = scaler.inverse_transform(kmeans.cluster_centers_)#escala original
+
+idx_Annual_Income = X_normalizado.columns.get_loc('Annual Income (k$)')
+idx_Spending_Score = X_normalizado.columns.get_loc('Spending Score (1-100)')
+
+#usar dados não normalizados
+plt.scatter(X_original['Annual Income (k$)'], X_original['Spending Score (1-100)'], c=clusters)
+plt.scatter(centroids[:, idx_Annual_Income], centroids[:, idx_Spending_Score], c='red', marker='X', s=200)
+plt.xlabel('Annual Income (k$)')
+plt.ylabel('Spending Score (1-100)')
+plt.title('Clusters com centróides')
+plt.show()
+
+df_resultado = df.copy()
+df_resultado['Cluster'] = clusters
+
+#agrupa pelo cluster e tira a média de idade, renda e gastos
+perfil_numerico = df_resultado.groupby('Cluster')[['Age', 'Annual Income (k$)', 'Spending Score (1-100)']].mean().round(1)
+print(f"Perfil numérico:\n{perfil_numerico}")
+
+#quantos homens e mulheres caíram em cada grupo
+perfil_genero = df_resultado.groupby(['Cluster', 'Gender']).size().unstack(fill_value=0)
+print(f"Perfil de gênero:\n{perfil_genero}")
