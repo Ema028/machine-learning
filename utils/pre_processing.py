@@ -118,11 +118,8 @@ class Dataframe:
 	def std_scaler(self):
 		scaler = StandardScaler()
 
-		columns_X_train = self.X_train.columns
-		columns_X_test = self.X_test.columns
-
-		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=columns_X_train)
-		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=columns_X_test)
+		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
+		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
 
 
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
