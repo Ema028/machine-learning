@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from imblearn.over_sampling import SMOTE
 
 class Dataframe:
@@ -116,6 +116,12 @@ class Dataframe:
 
 	def std_scaler(self):
 		scaler = StandardScaler()
+
+		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
+		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
+
+	def robust_scaler(self):
+		scaler = RobustScaler()
 
 		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
 		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
