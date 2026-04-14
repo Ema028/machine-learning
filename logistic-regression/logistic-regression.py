@@ -38,10 +38,10 @@ data.box_plot('cardio_disease', 'weight', "Doenças Cardíacas por peso")
 
 data.separar_base('cardio_disease')
 data.std_scaler() #regressão logística é sensível à escala das variáveis, padronizar garante que variáveis com valores altos não dominem o modelo
-verificar_base(data.X_train, data.X_test, data.y_train, data.y_test, 'cardio_disease') #dados já balanceados
+verificar_base(data.X_train_scalled, data.X_test_scalled, data.y_train, data.y_test, 'cardio_disease') #dados já balanceados
 
 log_reg = LogisticRegression(max_iter=1000)
-log_reg.fit(data.X_train, data.y_train)
+log_reg.fit(data.X_train_scalled, data.y_train)
 
 intercept = log_reg.intercept_[0]
 print(f"\nIntercept: {intercept:.4f}\n")
@@ -49,7 +49,7 @@ print(f"\nIntercept: {intercept:.4f}\n")
 #peso que o modelo deu para cada variável, com os dados padronizados dá comparar esses valores diretamente
 coeficientes = log_reg.coef_[0]
 df_coef = pd.DataFrame({
-    'Variável': data.X_train.columns,
+    'Variável': data.X_train_scalled.columns,
     'Coeficiente': coeficientes
 })
 df_coef = df_coef.sort_values(by='Coeficiente', ascending=False)
@@ -57,7 +57,7 @@ print(df_coef.to_string(index=False))
 '''smoke e gluc ficaram com pesos negativos, variável de confusão, 
 os fumantes da base podem ser mais jovens ou magros e isso ter mascarado o efeito do cigarro'''
 
-previsoes = log_reg.predict(data.X_test)
+previsoes = log_reg.predict(data.X_test_scalled)
 acuracia = accuracy_score(data.y_test, previsoes)
 print(f"\nAcurácia do Modelo: {acuracia * 100:.2f}%\n")
 print(classification_report(data.y_test, previsoes))
@@ -66,7 +66,7 @@ precisão de 63%, o seu modelo acerta 63% das vezes quando diz que uma pessoa es
 recall de 58%, o modelo só conseguiu detectar 58% dos doentes da base, ou seja, 42% de falsos negativos
 em um cenário médico real seria perigoso'''
 
-previsoes_proba = log_reg.predict_proba(data.X_test)[:, 1] #probabilidades dos doentes
+previsoes_proba = log_reg.predict_proba(data.X_test_scalled)[:, 1] #probabilidades dos doentes
 plt.figure(figsize=(8, 6))
 
 fpr, tpr, thresholds = roc_curve(data.y_test, previsoes_proba)

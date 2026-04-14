@@ -12,7 +12,8 @@ class Dataframe:
 		self.X_train = None
 		self.X_test = None
 		self.y_train = None
-		self.y_test = None
+		self.X_train_scalled = None
+		self.X_test_scalled = None
 
 	def print_missing(self):
 		missing = self.df.isnull().sum()
@@ -117,8 +118,8 @@ class Dataframe:
 	def std_scaler(self):
 		scaler = StandardScaler()
 
-		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
-		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
+		self.X_train_scalled = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
+		self.X_test_scalled = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
 
 	def robust_scaler(self):
 		scaler = RobustScaler()
