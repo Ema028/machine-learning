@@ -57,20 +57,21 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 ### 🎯 Modelos de Classificação
 * **[Árvore de Decisão](./decision-tree)**
   * **Objetivo:** Prever se um cliente terá uma pontuação de crédito alta.
-  * **Destaques:** Utilização de Cross-Validation. Análise comparativa entre uma árvore completa e uma árvore reduzida (pruning), com a reduzida apresentando melhor desempenho de generalização. Contém comparativos de performance com o modelo Naive Bayes.
+  * **Destaques:** Utilização de **Cross-Validation**. Análise comparativa entre uma árvore completa e uma árvore reduzida (pruning), com a reduzida apresentando melhor desempenho de generalização. Contém comparativos de performance com o modelo **Naive Bayes**.
 * **[Naive Bayes](./naive-bayes)**
   * **Objetivo:** Previsão de pontuação de crédito alta (mesma base da Árvore de Decisão).
-  * **Destaques:** Validação com Cross-Validation e análise probabilística.
+  * **Destaques:** Validação com **Cross-Validation** e análise probabilística.
 * **[Random Forest](./random-forest)**
   * **Objetivo:** Análise e previsão da qualidade de vinhos.
-  * **Destaques:** Avaliação de modelo completo vs. reduzido (Feature Selection). Otimização de hiperparâmetros utilizando **Random Search**. Melhoria drástica de performance na etapa final aplicando técnicas de **Binning** e balanceamento com **SMOTE**.
-* **[Regressão Logística](./logistic-regression)**
-  * **Objetivo:** Identificar se um paciente está propenso a doenças cardiovasculares.
+  * **Destaques:** Avaliação de modelo completo vs. reduzido (**Feature Selection**). Otimização de hiperparâmetros utilizando **Random Search**. Melhoria drástica de performance na etapa final aplicando técnicas de **Binning** e balanceamento com **SMOTE**.
+* **[Detecção de Fumaça em Sensores IoT](./smoke_detection)**
+  * **Objetivo:** Prever a ocorrência de incêndios utilizando dados de sensores ambientais.
+  * **Destaques:** Identificação e correção de **Data Leakage** (isolamento de variáveis temporais). Implementação de Regressão Logística como **baseline**. Otimização de hardware orientada por **Feature Importance**, reduzindo a placa IoT de 12 para apenas 3 sensores (TVOC, Etanol e Pressão), mantendo performance sob **Cross-Validation** rigorosa.
 
 ### 🧩 Modelos de Clusterização (Não-Supervisionados)
 * **[K-Means: Pinguins](./penguins-clustering-kmeans)**
   * **Objetivo:** Clusterização de espécies de pinguins.
-  * **Destaques:** Definição de clusters utilizando os métodos **Elbow** e **Silhouette**. Validação externa dos agrupamentos utilizando a métrica `adjusted_rand_score`.
+  * **Destaques:** Definição de clusters utilizando os métodos **Elbow** e **Silhouette**. Validação externa dos agrupamentos utilizando a métrica **adjusted_rand_score**.
 * **[K-Means: Segmentação de Clientes](./segmentacao-clientes-kmeans)**
   * **Objetivo:** Segmentação da base de clientes de um shopping.
   * **Destaques:** Cruzamento final dos clusters com dados demográficos (gênero e idade). Análise profunda do perfil de cada grupo com foco em **estratégia comercial e negócios**.
@@ -82,5 +83,4 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 * **Support Vector Machines (SVM):** Classificação de margem máxima.
 * **Pipelines Completos (End-to-End):** 
   * Projeto focando em redução de dimensionalidade com **PCA**.
-  * Projeto focado em validação cruzada avançada (**Cross-Validation**).
   * +2 Projetos práticos completos, com a seleção do algoritmo ditada estritamente pela natureza da base de dados e do problema de negócio.
