@@ -99,8 +99,11 @@ class Dataframe:
 			self.df[col] = np.log1p(self.df[col]) #log +1 para caso de 0
 
 	#dividir base em conjuntos de treino (por default 80%) e teste (por default 20%)
-	def separar_base(self, target_column, test_size=0.2, random_state=42):
-		x = self.df.drop(columns=[target_column]) #x é todas as variáveis menos target
+	def separar_base(self, target_column, test_size=0.2, random_state=42, columns = None):
+		if columns:
+			x = self.df.drop(columns=columns) #x é todas as variáveis menos target e variáveis q poderiam causar data leakage
+		else:
+			x = self.df.drop(columns=[target_column])
 		y = self.df[target_column] #y é target
 
 		self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
