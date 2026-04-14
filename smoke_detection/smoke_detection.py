@@ -1,8 +1,9 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import cross_val_score
 from utils.pre_processing import *
+#from sklearn.model_selection import RandomizedSearchCV
 
 df = pd.read_csv("../data/smoke_detection.csv", delimiter=',')
 print(df.info()) #só variáveis numéricas
@@ -15,7 +16,8 @@ print(data.df.describe().T)
 #sinais de outliers nas colunas:
 colunas_outliers = ['TVOC[ppb]', 'eCO2[ppm]', 'PM1.0', 'PM2.5', 'NC0.5', 'NC1.0', 'NC2.5']
 for coluna in colunas_outliers:
-    data.box_plot(coluna, None, f'Distribuição: {coluna}', x=8, y=6)
+    #data.box_plot(coluna, None, f'Distribuição: {coluna}', x=8, y=6)
+    pass
 data.apply_log(colunas_outliers) #faz sentido para cauda muito longa, muitos outliers e regressão logística como baseline
 """
 como é um problema de classificação binária,incêndio ou não incêndio, 
@@ -30,19 +32,27 @@ data.smote() #balancear dados de treino
 data.std_scaler() #escalonamento por causa da regressão
 
 log_reg = LogisticRegression(max_iter=1000)
-log_reg.fit(data.X_train_scalled, data.y_train)
 
-previsoes = log_reg.predict(data.X_test_scalled)
-acuracia = accuracy_score(data.y_test, previsoes)
-print(f"\nAcurácia da regressão logistica: {acuracia * 100:.2f}%\n")
+cv_log = cross_val_score(log_reg, data.X_train_scalled, data.y_train, cv=5)
+print(f"Scores individuais da regressão logística: {np.round(cv_log * 100, 2)}%")
+print(f"Média dos 5 folds: {cv_log.mean() * 100:.2f}%")
+
+log_reg.fit(data.X_train_scalled, data.y_train)
+previsoes = log_reg.predict(data.X_test_scalled) #teste cego
+print(f"\nAcurácia da regressão logistica: {accuracy_score(data.y_test, previsoes) * 100:.2f}%\n")
 print(f"Relatório de Classificação:\n{classification_report(data.y_test, previsoes)}")
 
 random_forest = RandomForestClassifier(random_state=42)
+
+cv_rf = cross_val_score(random_forest, data.X_train, data.y_train, cv=5)
+print(f"Scores individuais do random forest: {np.round(cv_rf * 100, 2)}%")
+print(f"Média dos 5 folds: {cv_rf.mean() * 100:.2f}%")
+
 random_forest.fit(data.X_train, data.y_train)
 y_pred = random_forest.predict(data.X_test)
-
 print(f"Acurácia de random forest: {accuracy_score(data.y_test, y_pred) * 100:.2f}%\n")
 print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred)}")
+
 '''
 random search foi retirado do código por não ter espaço para melhora,
 métricas de random forest já maximizadas, só causa risco de overfitting
@@ -73,3 +83,20 @@ print(f"\nMelhores Hiperparâmetros: {random_search.best_params_}\n")
 y_pred_rs = melhor_modelo.predict(data.X_test)
 print(f"Acurácia do melhor modelo nos dados de teste: {accuracy_score(data.y_test, y_pred_rs) * 100:.2f}%\n")
 print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_rs)}")'''
+
+data.heatmap() #7 sensores PM e NC trazem basicamente a mesma informação
+colunas_top3 = data.X_train.columns[random_forest.feature_importances_.argsort()[-3:]]
+
+print(f"Sensores mantidos no modelo reduzido: {list(colunas_top3)}\n")
+X_train_reduzido = data.X_train[colunas_top3]
+X_test_reduzido = data.X_test[colunas_top3]
+
+random_forest_reduzido = RandomForestClassifier(random_state=42)
+cv_rf_reduzido = cross_val_score(random_forest_reduzido, X_train_reduzido, data.y_train, cv=5)
+print(f"Scores individuais por Fold: {np.round(cv_rf_reduzido * 100, 2)}%")
+print(f"Média dos 5 folds: {cv_rf_reduzido.mean() * 100:.2f}%\n")
+
+random_forest_reduzido.fit(X_train_reduzido, data.y_train)
+y_pred_reduzido = random_forest_reduzido.predict(X_test_reduzido)
+print(f"Acurácia do modelo reduzido: {accuracy_score(data.y_test, y_pred_reduzido) * 100:.2f}%\n")
+print(f"Relatório de Classificação do modelo reduzido:\n{classification_report(data.y_test, y_pred_reduzido)}")
