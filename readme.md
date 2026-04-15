@@ -66,7 +66,7 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
   * **Destaques:** Avaliação de modelo completo vs. reduzido (**Feature Selection**). Otimização de hiperparâmetros utilizando **Random Search**. Melhoria drástica de performance na etapa final aplicando técnicas de **Binning** e balanceamento com **SMOTE**.
 * **[Detecção de Fumaça em Sensores IoT](./smoke_detection)**
   * **Objetivo:** Prever a ocorrência de incêndios utilizando dados de sensores ambientais.
-  * **Destaques:** Identificação e correção de **Data Leakage** (isolamento de variáveis temporais). Implementação de Regressão Logística como **baseline**. Otimização de hardware orientada por **Feature Importance**, reduzindo a placa IoT de 12 para apenas 3 sensores (TVOC, Etanol e Pressão), mantendo performance sob **Cross-Validation** rigorosa.
+  * **Destaques:** Identificação e correção de **Data Leakage** (isolamento de variáveis temporais). Implementação de Regressão Logística como **baseline**. Otimização de hardware focada na redução de dimensionalidade: transição de análise visual (Heatmap) para diagnóstico matemático com **VIF (Variance Inflation Factor)**, identificando redundância extrema (VIF > 500.000) em sensores de partículas. Redução da placa IoT de 12 para apenas 3 sensores (TVOC, Etanol e Pressão), mantendo a performance sob **Cross-Validation** rigorosa e **max_depth** controlado.
 
 ### 🧩 Modelos de Clusterização (Não-Supervisionados)
 * **[K-Means: Pinguins](./penguins-clustering-kmeans)**
