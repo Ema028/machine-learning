@@ -16,8 +16,8 @@ print(data.df.describe().T)
 #sinais de outliers nas colunas:
 colunas_outliers = ['TVOC[ppb]', 'eCO2[ppm]', 'PM1.0', 'PM2.5', 'NC0.5', 'NC1.0', 'NC2.5']
 for coluna in colunas_outliers:
-    #data.box_plot(coluna, None, f'Distribuição: {coluna}', x=8, y=6)
-    pass
+    data.box_plot(coluna, None, f'Distribuição: {coluna}', x=8, y=6)
+
 data.apply_log(colunas_outliers) #faz sentido para cauda muito longa, muitos outliers e regressão logística como baseline
 """
 como é um problema de classificação binária,incêndio ou não incêndio, 
@@ -55,7 +55,10 @@ print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pr
 
 '''
 random search foi retirado do código por não ter espaço para melhora,
-métricas de random forest já maximizadas, só causa risco de overfitting
+métricas de random forest já maximizadas e de Cross-Validation também, provando que o modelo generaliza, não é overfitting,
+e data leakage também foi resolvido,foco foi limitar a complexidade do modelo para baixo consumo de memória
+'''
+'''
 param_grid = {
     'n_estimators': [50, 100, 200],            #n_arvores
     'max_depth': [None, 10, 20, 30],           #profundidade máxima
@@ -85,13 +88,19 @@ print(f"Acurácia do melhor modelo nos dados de teste: {accuracy_score(data.y_te
 print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_rs)}")'''
 
 data.heatmap() #7 sensores PM e NC trazem basicamente a mesma informação
+print(f"Análise de Multicolinearidade\n: {data.get_vif()}\n")
 colunas_top3 = data.X_train.columns[random_forest.feature_importances_.argsort()[-3:]]
 
 print(f"Sensores mantidos no modelo reduzido: {list(colunas_top3)}\n")
 X_train_reduzido = data.X_train[colunas_top3]
 X_test_reduzido = data.X_test[colunas_top3]
 
-random_forest_reduzido = RandomForestClassifier(random_state=42)
+#testando limitar a profundidade para evitar árvores pesadas
+random_forest_reduzido = RandomForestClassifier(
+    n_estimators=50,
+    max_depth=5,
+    random_state=42
+)
 cv_rf_reduzido = cross_val_score(random_forest_reduzido, X_train_reduzido, data.y_train, cv=5)
 print(f"Scores individuais por Fold: {np.round(cv_rf_reduzido * 100, 2)}%")
 print(f"Média dos 5 folds: {cv_rf_reduzido.mean() * 100:.2f}%\n")
