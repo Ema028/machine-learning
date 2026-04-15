@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.tools.tools import add_constant
 from imblearn.over_sampling import SMOTE
 
 class Dataframe:
@@ -130,6 +132,17 @@ class Dataframe:
 		self.X_train = pd.DataFrame(scaler.fit_transform(self.X_train), columns=self.X_train.columns)
 		self.X_test = pd.DataFrame(scaler.transform(self.X_test), columns=self.X_test.columns)
 
+	def get_vif(self):
+		"""
+        fator de inflação de variância para identificar multicolinearidade,
+        VIF > 10 indica alta redundância
+        """
+		X = self.X_train.copy() #não modificar dados
+		X_const = add_constant(X) #simula intercepto
+		vif_df = pd.DataFrame()
+		vif_df["Variável"] = X_const.columns
+		vif_df["VIF"] = [variance_inflation_factor(X_const.values, i) for i in range(X_const.shape[1])]
+		return vif_df[vif_df["Variável"] != 'const'].sort_values(by="VIF", ascending=False).reset_index(drop=True)
 
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 	#se y for series do pandas, tem 1 coluna
