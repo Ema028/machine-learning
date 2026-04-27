@@ -45,9 +45,9 @@ class Dataframe:
 		plt.title(title)
 		plt.show()
 
-	def scattergram(self, axis_x, axis_y, title, x = 12, y = 8):
+	def scattergram(self, axis_x, axis_y, title, x = 12, y = 8, alpha=1.0):
 		plt.figure(figsize=(x, y))
-		sns.scatterplot(x=axis_x, y=axis_y, data=self.df)
+		sns.scatterplot(x=axis_x, y=axis_y, data=self.df, alpha=alpha)
 		plt.title(title)
 		plt.xlabel(axis_x)
 		plt.ylabel(axis_y)
@@ -61,8 +61,38 @@ class Dataframe:
 		plt.ylabel(axis_y)
 		plt.show()
 
+	def box_plot_multi(self, columns, title, x = 12, y = 8):
+		plt.figure(figsize=(x, y))
+		sns.boxplot(data=self.df[columns])
+		plt.title(title)
+		plt.xticks(rotation=45)
+		plt.tight_layout()
+		plt.show()
+
 	def pair_plot(self, hue = None):
 		sns.pairplot(self.df, hue = hue)
+		plt.show()
+
+	def bar_plot(self, axis_x, axis_y, title, x=12, y=8, estimator= np.mean):
+		plt.figure(figsize=(x, y))
+		#np.mean for mean, np.sum for sum
+		sns.barplot(x=axis_x, y=axis_y, data=self.df,
+					estimator=estimator, errorbar=None)
+		plt.title(title)
+		plt.xlabel(axis_x)
+		plt.ylabel(axis_y)
+		plt.xticks(rotation=45)
+		plt.tight_layout()
+		plt.show()
+
+	def reg_plot(self, axis_x, axis_y, title, x=12, y=8, scatter_alpha=0.5, line_color='red', log = True):
+		plt.figure(figsize=(x, y))
+		sns.regplot(x=axis_x, y=axis_y, data=self.df,
+					scatter_kws={'alpha': scatter_alpha}, line_kws={'color': line_color}, logistic=log)
+
+		plt.title(title)
+		plt.xlabel(axis_x)
+		plt.ylabel(axis_y)
 		plt.show()
 
 	def heatmap(self, x = 12, y = 8):
@@ -175,8 +205,8 @@ def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 	# porcentagem de cada classe na base de teste e treino, deve estar balanceado em treino e desbalanceado em teste
 	proporcao_teste = y_teste.value_counts(normalize=True) * 100
 	proporcao_treino = y_treino.value_counts(normalize=True) * 100
-	print(proporcao_teste.apply(lambda x: f"{x:.2f}%"))
-	print(proporcao_treino.apply(lambda x: f"{x:.2f}%\n"))
+	print(f"proporção base de teste: {proporcao_teste.apply(lambda x: f"{x:.2f}%")}")
+	print(f"proporção base de treino: {proporcao_treino.apply(lambda x: f"{x:.2f}%\n")}")
 
 	nulos_treino = X_treino.isnull().sum().sum()
 	nulos_teste = X_teste.isnull().sum().sum()
