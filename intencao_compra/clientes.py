@@ -108,7 +108,52 @@ cm = confusion_matrix(data.y_test, previsoes)
 class_names = ['Não comprador web', 'Comprador web']
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
             xticklabels=class_names, yticklabels=class_names)
-plt.title('Matriz de Confusão')
+plt.title('Matriz de Confusão - Regressão Logística')
 plt.ylabel('Valor Real')
 plt.xlabel('Previsão')
+plt.show()
+
+random_forest = RandomForestClassifier(random_state=42)
+random_forest.fit(data.X_train, data.y_train)
+y_pred = random_forest.predict(data.X_test)
+
+print(f"Acurácia do modelo nos dados de teste: {accuracy_score(data.y_test, y_pred) * 100:.2f}%\n")
+print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred)}")
+
+param_grid = {
+    'n_estimators': [50, 100, 200],            #n_arvores
+    'max_depth': [None, 10, 20, 30],           #profundidade máxima
+    'min_samples_split': [2, 5, 10],           #mínimo de amostras para dividir um nó
+    'min_samples_leaf': [1, 2, 4],             #mínimo de amostras em nó folha
+    'max_features': ['sqrt', 'log2', None]     #n_caracteristicas
+}
+
+random_forest_base = RandomForestClassifier(random_state=42)
+#100 combinações aleatórias, 5 folds de validação cruzada
+random_search = RandomizedSearchCV(
+    estimator=random_forest_base,
+    param_distributions=param_grid,
+    n_iter=100,
+    cv=5,
+    verbose=2,          #mostra o progresso no terminal
+    random_state=42,
+    n_jobs=-1           #todos os núcleos do processador para ser mais rápido
+)
+
+random_search.fit(data.X_train, data.y_train)
+melhor_modelo = random_search.best_estimator_
+print(f"\nMelhores Hiperparâmetros: {random_search.best_params_}\n")
+
+y_pred_rs = melhor_modelo.predict(data.X_test)
+print(f"Acurácia depois de Random Search: {accuracy_score(data.y_test, y_pred_rs) * 100:.2f}%\n")
+print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_rs)}")
+'''tinha 90.99% de acurácia antes e foi refinado para 91.44% depois do random search, além de um recall de 95% para o positivo
+sendo superior e cometendo menos erros que a regressão logística nesse caso'''
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(confusion_matrix(data.y_test, y_pred_rs), annot=True, fmt='d', cmap='Blues',
+            xticklabels=class_names, yticklabels=class_names)
+plt.xlabel('Previsão')
+plt.ylabel('Valor Real')
+plt.title('Matriz de Confusão - Random Forest')
 plt.show()
