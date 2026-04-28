@@ -1,4 +1,8 @@
 from utils.pre_processing import *
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, roc_auc_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import RandomizedSearchCV
 
 df = pd.read_csv("../data/campaign.csv", delimiter=';')
 print(df.info()) #tipos certos, 2 categóricas
@@ -56,3 +60,55 @@ a partir da quarta ida à loja taxa de conversão alta, cliente converte-se natu
 data.separar_base('WebPurchases')
 verificar_base(data.X_train, data.X_test, data.y_train, data.y_test, 'WebPurchases') #balanceado já
 data.std_scaler()
+
+log_reg = LogisticRegression(max_iter=1000) #modelo base
+log_reg.fit(data.X_train_scalled, data.y_train)
+
+intercept = log_reg.intercept_[0]
+print(f"\nIntercept: {intercept:.4f}\n")
+
+#peso que o modelo deu para cada variável, com os dados padronizados dá comparar esses valores diretamente
+coeficientes = log_reg.coef_[0]
+df_coef = pd.DataFrame({
+    'Variável': data.X_train_scalled.columns,
+    'Coeficiente': coeficientes
+})
+df_coef = df_coef.sort_values(by='Coeficiente', ascending=False)
+print(df_coef.to_string(index=False))
+'''alto consumo de vinhos e número de visitas ao site são os maiores impulsionadores de compras na web
+os pessoas mais jovens, solteiras e com filhos, têm menor conversão online'''
+
+previsoes = log_reg.predict(data.X_test_scalled)
+acuracia = accuracy_score(data.y_test, previsoes)
+print(f"\nAcurácia do Modelo: {acuracia * 100:.2f}%\n")
+print(classification_report(data.y_test, previsoes))
+'''86% de acurácia e recall alto de 93% para positivos, o algoritmo é bom em identificar potencial compradores'''
+
+previsoes_proba = log_reg.predict_proba(data.X_test_scalled)[:, 1] #tds as linhas da coluna de indice 1(probabilidade de cada previsão)
+plt.figure(figsize=(8, 6))
+
+fpr, tpr, thresholds = roc_curve(data.y_test, previsoes_proba) #fpr(taxa falsos positivos) tpr(taxa de verdadeiros positivos) threshold(cutoff de qtns % de certeza eu tenho)
+auc_score = roc_auc_score(data.y_test, previsoes_proba)
+
+plt.plot(fpr, tpr, color='blue', lw=2, label=f'Curva ROC (área = {auc_score:.2f})')
+#linha de referência do chute aleatório
+plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Taxa de Falsos Positivos')
+plt.ylabel('Taxa de Verdadeiros Positivos')
+plt.title('Curva ROC')
+plt.legend(loc="lower right")
+plt.grid(True)
+plt.show()
+#auc-roc de 91%
+
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(data.y_test, previsoes)
+class_names = ['Não comprador web', 'Comprador web']
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+            xticklabels=class_names, yticklabels=class_names)
+plt.title('Matriz de Confusão')
+plt.ylabel('Valor Real')
+plt.xlabel('Previsão')
+plt.show()
