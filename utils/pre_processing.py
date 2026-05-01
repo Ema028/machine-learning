@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler, LabelEncoder
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import add_constant
 from imblearn.over_sampling import SMOTE
@@ -105,6 +105,21 @@ class Dataframe:
 		cat_cols = self.df.select_dtypes(include=['object', 'str']).columns
 		self.df = pd.get_dummies(self.df, columns=cat_cols, drop_first=True)
 		return self.df
+
+	def label_encoding(self):
+		cat_cols = self.df.select_dtypes(include=['object', 'str']).columns
+		dicionario_encoders = {}
+
+		for col in cat_cols:
+			le = LabelEncoder()
+			self.df[col] = le.fit_transform(self.df[col].astype(str))
+			dicionario_encoders[col] = le
+
+		return dicionario_encoders
+
+	def reverter_label_encoding(self, dicionario_encoders, columns):
+		for col in columns:
+			self.df[col] = dicionario_encoders[col].inverse_transform(self.df[col])
 
 	def one_hot_heatmap(self):
 		#one-hot encoding: cria colunas binárias para cada categoria, evita falsa ordem hierárquica como em label encoding
