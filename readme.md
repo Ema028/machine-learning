@@ -70,9 +70,12 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 * **[Previsão de Conversão em E-commerce](./intencao_compra)**
   * **Objetivo:** Prever a conversão de clientes no canal digital (compras web) baseando-se em perfil demográfico, histórico de consumo e comportamento multicanal.
   * **Destaques:** Construção de um pipeline completo de dados com engenharia de features (agrupamento de categorias, *capping* de outliers, **One-Hot Encoding** e **Log Transformation**). Extração de **insights de negócio** focados no funil de conversão e comportamento *omnichannel* (loja física vs. online). Avaliação e comparação de múltiplos algoritmos para estabelecer um *baseline* interpretável, otimização do modelo via **RandomizedSearchCV**, atingindo um excelente *recall* de 95% para a classe compradora.
-* **[XGBoost: Previsão de Conversão de Vendas](./xgboost)**
+* **[XGBoost](./xgboost)**
   * **Objetivo:** Prever a probabilidade de um cliente comprar um veículo com base no perfil demográfico e financeiro.
   * **Destaques:** Extração e análise visual de **Probabilidades (`predict_proba`)** para tomada de decisão em negócios. Análise de **Feature Importance**. **Label Encoding**.
+* **[SVM](./svm)**
+  * **Objetivo:** Prever a propensão de compra de veículos baseando-se no perfil demográfico e financeiro do cliente.
+  * **Destaques:** Padronização rigorosa de escala (**StandardScaler**) para viabilizar os cálculos de distância vetorial do Support Vector Machine. Testes de fronteira de decisão utilizando **Kernels Linear e Polinomial**. Avaliação crítica comparando algoritmos baseados em árvores (**XGBoost**) sobre abordagens geométricas (**SVM**) para capturar as regras complexas e não-lineares inerentes a bases de dados tabulares de negócios.
 
 ### 🧩 Modelos de Clusterização (Não-Supervisionados)
 * **[K-Means: Pinguins](./penguins-clustering-kmeans)**
@@ -85,6 +88,5 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 ---
 
 ## ⏳ Em Breve (Na Fila de Desenvolvimento)
-* **Support Vector Machines (SVM):** Classificação de margem máxima.
 * **Pipelines Completos (End-to-End):**
   * +2 Projetos práticos completos, com a seleção do algoritmo ditada estritamente pela natureza da base de dados e do problema de negócio.
