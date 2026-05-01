@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree, DecisionTreeClassifier
 from utils.pre_processing import verificar_base, conf_matrix
