@@ -37,5 +37,3 @@ e na classe de compradores aumentou tanto a precisão (de 89% para 91%) quanto o
 linha que separa os compradores dos não-compradores nos seus dados não é perfeitamente reta -> adicionar curvatura (polinômios) ajudou o algoritmo'''
 '''XGBoost obteve de longe as melhores previsões comparado com os dois
 91.5% de acurácia geral, recall de 86% e precisão de 94% na classe 1'''
-
-

@@ -1,6 +1,6 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -85,22 +85,7 @@ print(classification_report(data.y_test, previsoes))
 '''86% de acurácia e recall alto de 93% para positivos, o algoritmo é bom em identificar potencial compradores'''
 
 previsoes_proba = log_reg.predict_proba(data.X_test_scalled)[:, 1] #tds as linhas da coluna de indice 1(probabilidade de cada previsão)
-plt.figure(figsize=(8, 6))
-
-fpr, tpr, thresholds = roc_curve(data.y_test, previsoes_proba) #fpr(taxa falsos positivos) tpr(taxa de verdadeiros positivos) threshold(cutoff de qtns % de certeza eu tenho)
-auc_score = roc_auc_score(data.y_test, previsoes_proba)
-
-plt.plot(fpr, tpr, color='blue', lw=2, label=f'Curva ROC (área = {auc_score:.2f})')
-#linha de referência do chute aleatório
-plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('Taxa de Falsos Positivos')
-plt.ylabel('Taxa de Verdadeiros Positivos')
-plt.title('Curva ROC')
-plt.legend(loc="lower right")
-plt.grid(True)
-plt.show()
+auc_roc(data.y_test, previsoes_proba)
 #auc-roc de 91%
 
 class_names = ['Não comprador web', 'Comprador web']

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, LabelEncoder
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix,  roc_curve, roc_auc_score
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import add_constant
 from imblearn.over_sampling import SMOTE
@@ -197,6 +197,26 @@ def conf_matrix(y_test, previsoes, class_names):
 	plt.title('Matriz de Confusão')
 	plt.ylabel('Valor Real')
 	plt.xlabel('Previsão')
+	plt.show()
+
+def auc_roc(y_test, previsoes_proba, x=8, y=6):
+	plt.figure(figsize=(x, y))
+	if len(previsoes_proba.shape) > 1:
+		previsoes_proba = previsoes_proba[:, 1]
+	# fpr(taxa falsos positivos) tpr(taxa de verdadeiros positivos) threshold(cutoff de qtns % de certeza eu tenho)
+	fpr, tpr, thresholds = roc_curve(y_test, previsoes_proba)
+	auc_score = roc_auc_score(y_test, previsoes_proba)
+
+	plt.plot(fpr, tpr, color='blue', lw=2, label=f'Curva ROC (área = {auc_score:.2f})')
+	# linha de referência do chute aleatório
+	plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.05])
+	plt.xlabel('Taxa de Falsos Positivos')
+	plt.ylabel('Taxa de Verdadeiros Positivos')
+	plt.title('Curva ROC')
+	plt.legend(loc="lower right")
+	plt.grid(True)
 	plt.show()
 
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):

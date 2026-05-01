@@ -27,6 +27,7 @@ modelo_xgb.fit(data.X_train, data.y_train)
 
 previsoes = modelo_xgb.predict(data.X_test)
 prob = modelo_xgb.predict_proba(data.X_test)
+auc_roc(data.y_test, prob)
 df_resultados = pd.DataFrame({'Previsão': previsoes,
                               'Probabilidade Compra': np.round(prob[:, 1] * 100, decimals= 2)})
 print(df_resultados.head())

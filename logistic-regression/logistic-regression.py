@@ -1,6 +1,6 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report
 
 #o objetivo é construir um modelo de regressão capaz de indicar se novos pacientes estão propensos a doenças cariovasculares
 df = pd.read_csv("../data/cardio.csv", delimiter=';')
@@ -67,23 +67,7 @@ recall de 58%, o modelo só conseguiu detectar 58% dos doentes da base, ou seja,
 em um cenário médico real seria perigoso'''
 
 previsoes_proba = log_reg.predict_proba(data.X_test_scalled)[:, 1] #probabilidades dos doentes
-plt.figure(figsize=(8, 6))
-
-fpr, tpr, thresholds = roc_curve(data.y_test, previsoes_proba)
-auc_score = roc_auc_score(data.y_test, previsoes_proba)
-
-plt.plot(fpr, tpr, color='blue', lw=2, label=f'Curva ROC (área = {auc_score:.2f})')
-#linha de referência do chute aleatório
-plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
-
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('Taxa de Falsos Positivos')
-plt.ylabel('Taxa de Verdadeiros Positivos')
-plt.title('Curva ROC')
-plt.legend(loc="lower right")
-plt.grid(True)
-plt.show()
+auc_roc(data.y_test, previsoes_proba)
 '''curva mostra a relação entre acertos reais e alarmes falsos,
 área de 0.68 indica que o modelo tem 68% de chance de distinguir doentes e saudáveis,
 acima da linha vermelha, um pouco melhor que acaso, mas não tem muito poder preditivo'''
