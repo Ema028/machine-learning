@@ -1,5 +1,5 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import RandomizedSearchCV
 from utils.pre_processing import *
 
@@ -47,14 +47,7 @@ print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pr
 print(f"Acurácia do modelo reduzido nos dados de teste: {accuracy_score(y_test_reduzido, y_pred_reduzido) * 100:.2f}%\n")
 print(f"Relatório de Classificação do modelo reduzido:\n{classification_report(y_test_reduzido, y_pred_reduzido)}")
 
-plt.figure(figsize=(6, 4))
-sns.heatmap(confusion_matrix(data.y_test, y_pred), annot=True, fmt='d', cmap='Blues',
-            xticklabels=random_forest.classes_,
-            yticklabels=random_forest.classes_)
-plt.xlabel('Previsão')
-plt.ylabel('Valor Real')
-plt.title('Matriz de Confusão')
-plt.show()
+conf_matrix(data.y_test, y_pred, random_forest.classes_)
 ''''o modelo teve acurácia de ~64%, com as classes mais comuns (5 e 6) tendo bons F1-Scores (~0.71 e ~0.64)
 enquanto o modelo reduzido teve um desempenho muito parecido (~62%)
 
@@ -108,14 +101,7 @@ y_pred_upgrade = random_forest_upgrade.predict(data.X_test)
 print(f"Acurácia (com Binning + SMOTE): {accuracy_score(data.y_test, y_pred_upgrade) * 100:.2f}%\n")
 print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pred_upgrade)}")
 
-plt.figure(figsize=(6, 4))
-sns.heatmap(confusion_matrix(data.y_test, y_pred_upgrade), annot=True, fmt='d', cmap='Greens',
-            xticklabels=random_forest_upgrade.classes_,
-            yticklabels=random_forest_upgrade.classes_)
-plt.xlabel('Previsão')
-plt.ylabel('Valor Real')
-plt.title('Matriz de Confusão (Classes Agrupadas)')
-plt.show()
+conf_matrix(data.y_test, y_pred_upgrade, random_forest_upgrade.classes_)
 '''Análise do Modelo Pós-Upgrade 
 acurácia global saltou de ~66% para ~85.9%
 classe 'Ruim', era ignorada pelo modelo (Recall e F1 zerados), agora identifica 45% (Recall 0.45)

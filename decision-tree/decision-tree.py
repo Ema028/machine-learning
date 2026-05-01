@@ -3,8 +3,8 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree, DecisionTreeClassifier
-from utils.pre_processing import verificar_base
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from utils.pre_processing import verificar_base, conf_matrix
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import cross_val_score
 
 '''
@@ -64,15 +64,7 @@ plot_tree(arvore_decisao,
 plt.title("Visualização da Árvore de Decisão")
 plt.show()
 
-plt.figure(figsize=(6, 4))
-sns.heatmap(confusion_matrix(y_teste, pred_teste), annot=True, fmt='d', cmap='Blues',
-            xticklabels=class_names,
-            yticklabels=class_names)
-
-plt.xlabel('Previsão')
-plt.ylabel('Valor Real')
-plt.title('Matriz de Confusão')
-plt.show()
+conf_matrix(y_teste, pred_teste, class_names)
 
 profundidade = arvore_decisao.get_depth()
 print(f"A profundidade da árvore é: {profundidade}")
@@ -105,15 +97,7 @@ plot_tree(arvore_reduzida,
 plt.title("Árvore de Decisão apenas das 2 features principais")
 plt.show()
 
-plt.figure(figsize=(6, 4))
-sns.heatmap(confusion_matrix(y_teste, pred_red_teste), annot=True, fmt='d', cmap='Blues',
-            xticklabels=class_names,
-            yticklabels=class_names)
-
-plt.xlabel('Previsão')
-plt.ylabel('Valor Real')
-plt.title('Matriz de Confusão reduzida')
-plt.show()
+conf_matrix(y_teste, pred_red_teste, class_names)
 
 #a acurácia diminuiu um pouco, sendo ~94% na base de teste, enquanto no modelo original foi 100%, mas a árvore é visivelmente menor
 #o desempenho da árvore reduzida foi melhor considerando a simplicidade, errando só 2 amostras em 33

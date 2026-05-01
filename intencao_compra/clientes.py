@@ -1,6 +1,6 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, roc_curve, roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -103,15 +103,8 @@ plt.grid(True)
 plt.show()
 #auc-roc de 91%
 
-plt.figure(figsize=(8, 6))
-cm = confusion_matrix(data.y_test, previsoes)
 class_names = ['Não comprador web', 'Comprador web']
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=class_names, yticklabels=class_names)
-plt.title('Matriz de Confusão - Regressão Logística')
-plt.ylabel('Valor Real')
-plt.xlabel('Previsão')
-plt.show()
+conf_matrix(data.y_test, previsoes, class_names)
 
 random_forest = RandomForestClassifier(random_state=42)
 random_forest.fit(data.X_train, data.y_train)
@@ -150,10 +143,4 @@ print(f"Relatório de Classificação:\n{classification_report(data.y_test, y_pr
 '''tinha 90.99% de acurácia antes e foi refinado para 91.44% depois do random search, além de um recall de 95% para o positivo
 sendo superior e cometendo menos erros que a regressão logística nesse caso'''
 
-plt.figure(figsize=(8, 6))
-sns.heatmap(confusion_matrix(data.y_test, y_pred_rs), annot=True, fmt='d', cmap='Blues',
-            xticklabels=class_names, yticklabels=class_names)
-plt.xlabel('Previsão')
-plt.ylabel('Valor Real')
-plt.title('Matriz de Confusão - Random Forest')
-plt.show()
+conf_matrix(data.y_test, y_pred_rs, class_names)

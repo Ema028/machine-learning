@@ -3,9 +3,9 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
+from sklearn.metrics import accuracy_score, recall_score
 from sklearn.model_selection import cross_val_score
-from utils.pre_processing import verificar_base
+from utils.pre_processing import verificar_base, conf_matrix
 
 '''
 Descrição do Projeto: construção de um modelo de Machine Learning para prever se um cliente terá uma pontuação de crédito alta,
@@ -33,14 +33,8 @@ recall = recall_score(y_treino, pred_train, average='macro')
 print(f"\nAcurácia: {acuracia * 100:.2f}%")
 print(f"Recall: {recall * 100:.2f}%")
 
-conf_matrix = confusion_matrix(y_treino, pred_train)
 class_names = ['Crédito não alto', 'Crédito alto']
-plt.figure(figsize=(8, 6))
-sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
-plt.title('Matriz de Confusão (base de treino)', pad=15)
-plt.ylabel('Valor Real', fontweight='bold')
-plt.xlabel('Previsões', fontweight='bold')
-plt.show()
+conf_matrix(y_treino, pred_train, class_names)
 
 pred_test = naive_bayes.predict(X_teste)
 acuracia = accuracy_score(y_teste, pred_test)
@@ -50,14 +44,7 @@ recall = recall_score(y_teste, pred_test, average='macro')
 print(f"\nAcurácia: {acuracia * 100:.2f}%")
 print(f"Recall: {recall * 100:.2f}%\n\n")
 
-conf_matrix = confusion_matrix(y_teste, pred_test)
-class_names = ['Crédito não alto', 'Crédito alto']
-plt.figure(figsize=(8, 6))
-sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
-plt.title('Matriz de Confusão (base de teste)', pad=15)
-plt.ylabel('Valor Real', fontweight='bold')
-plt.xlabel('Previsões', fontweight='bold')
-plt.show()
+conf_matrix(y_teste, pred_test, class_names)
 '''comparação treino e teste:
 98.33% de acurácia no treino e 96.97% no teste, como a performance no teste foi superior ao treino,
 os números altos não foram por causa de overfitting, no início cogitei que o modelo poderia olhar Credit Score_Low

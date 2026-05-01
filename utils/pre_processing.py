@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, LabelEncoder
+from sklearn.metrics import confusion_matrix
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import add_constant
 from imblearn.over_sampling import SMOTE
@@ -188,6 +189,15 @@ class Dataframe:
 		vif_df["Variável"] = X_const.columns
 		vif_df["VIF"] = [variance_inflation_factor(X_const.values, i) for i in range(X_const.shape[1])]
 		return vif_df[vif_df["Variável"] != 'const'].sort_values(by="VIF", ascending=False).reset_index(drop=True)
+
+def conf_matrix(y_test, previsoes, class_names):
+	plt.figure(figsize=(8, 6))
+	sns.heatmap(confusion_matrix(y_test, previsoes), annot=True, fmt='d', cmap='Blues', cbar=False,
+				xticklabels=class_names, yticklabels=class_names)
+	plt.title('Matriz de Confusão')
+	plt.ylabel('Valor Real')
+	plt.xlabel('Previsão')
+	plt.show()
 
 def verificar_base(X_treino, X_teste, y_treino, y_teste, target_column):
 	#se y for series do pandas, tem 1 coluna

@@ -1,6 +1,6 @@
 from utils.pre_processing import *
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, roc_curve, roc_auc_score
 
 #o objetivo é construir um modelo de regressão capaz de indicar se novos pacientes estão propensos a doenças cariovasculares
 df = pd.read_csv("../data/cardio.csv", delimiter=';')
@@ -88,17 +88,7 @@ plt.show()
 área de 0.68 indica que o modelo tem 68% de chance de distinguir doentes e saudáveis,
 acima da linha vermelha, um pouco melhor que acaso, mas não tem muito poder preditivo'''
 
-plt.figure(figsize=(8, 6))
-cm = confusion_matrix(data.y_test, previsoes)
-class_names = ['Saudável', 'Doente']
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=class_names,
-            yticklabels=class_names)
-
-plt.title('Matriz de Confusão')
-plt.ylabel('Valor Real')
-plt.xlabel('Previsão')
-plt.show()
+conf_matrix(data.y_test, previsoes, ['Saudável', 'Doente'])
 
 '''regressão logística prevê a probabilidade de um evento ocorrer, pega os dados e mapeia entre 0 e 1 e 
 usa essa probabilidade para categorizar os dados em classes(modelo de classificação)
