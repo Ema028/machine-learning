@@ -67,6 +67,9 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 * **[Detecção de Fumaça em Sensores IoT](./smoke_detection)**
   * **Objetivo:** Prever a ocorrência de incêndios utilizando dados de sensores ambientais.
   * **Destaques:** Identificação e correção de **Data Leakage** (isolamento de variáveis temporais). Implementação de Regressão Logística como **baseline**. Otimização de hardware focada na redução de dimensionalidade: transição de análise visual (Heatmap) para diagnóstico matemático com **VIF (Variance Inflation Factor)**, identificando redundância extrema (VIF > 500.000) em sensores de partículas. Redução da placa IoT de 12 para apenas 3 sensores (TVOC, Etanol e Pressão), mantendo a performance sob **Cross-Validation** rigorosa e **max_depth** controlado.
+* **[XGBoost: Previsão de Conversão de Vendas](./xgboost)**
+  * **Objetivo:** Prever a probabilidade de um cliente comprar um veículo com base no perfil demográfico e financeiro.
+  * **Destaques:** Extração e análise visual de **Probabilidades (`predict_proba`)** para tomada de decisão em negócios. Análise de **Feature Importance**. **Label Encoding**.
 
 ### 🧩 Modelos de Clusterização (Não-Supervisionados)
 * **[K-Means: Pinguins](./penguins-clustering-kmeans)**
@@ -79,7 +82,6 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 ---
 
 ## ⏳ Em Breve (Na Fila de Desenvolvimento)
-* **XGBoost:** Implementação de árvores otimizadas com gradiente.
 * **Support Vector Machines (SVM):** Classificação de margem máxima.
 * **Pipelines Completos (End-to-End):** 
   * Projeto focando em redução de dimensionalidade com **PCA**.
