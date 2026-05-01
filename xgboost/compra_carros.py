@@ -43,3 +43,13 @@ conf_matrix(data.y_test, previsoes, ['Não compra', 'compra'])
 '''acurácia de 91.5%, precisão de 94% na classe1, 
 mas poucos alarmes falsos, recall de 86%, deixa passar alguns clientes reais, 
 mas de 96% para a classe0, eficiente em identificar quem não vai comprar'''
+
+importancias = modelo_xgb.get_booster().get_score(importance_type='gain')
+#corte por precisão como modelo_xgb.feature_importances_
+
+df_importancia = pd.DataFrame(list(importancias.items()), columns=['Feature', 'Importancia'])
+df_importancia = df_importancia.sort_values(by='Importancia', ascending=False).reset_index(drop=True)
+df_importancia['Importancia (%)'] = (df_importancia['Importancia']/df_importancia['Importancia'].sum() * 100).round(2)
+print(df_importancia)
+'''mais importantes confirmam o heatmap
+'Age' influencia mais o modelo (~59% e tem correlação de 0.62) e 'Gender' menos (~9%)'''
