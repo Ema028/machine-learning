@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, LabelEncoder
 from sklearn.metrics import confusion_matrix,  roc_curve, roc_auc_score
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.impute import KNNImputer
 from statsmodels.tools.tools import add_constant
 from imblearn.over_sampling import SMOTE
 
@@ -34,6 +35,15 @@ class Dataframe:
 	def drop_columns(self, columns):
 		self.df.drop(columns = columns, inplace=True)
 		return self.df
+
+	def to_number(self, colunas):
+		for col in colunas:
+			self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
+
+	def imputar_knn(self, colunas, n_vizinhos=5):
+		#encher valores nulos com base nos parecidos
+		imputer = KNNImputer(n_neighbors=n_vizinhos)
+		self.df[colunas] = pd.DataFrame(imputer.fit_transform(self.df[colunas]), columns=colunas)
 
 	def print_unique_values(self):
 		for column in self.df.select_dtypes(include='str').columns:
