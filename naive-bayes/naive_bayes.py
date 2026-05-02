@@ -1,7 +1,5 @@
 import pandas as pd
-import seaborn as sns
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, recall_score
 from sklearn.model_selection import cross_val_score

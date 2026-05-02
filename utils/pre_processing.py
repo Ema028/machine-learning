@@ -178,7 +178,6 @@ class Dataframe:
 		self.y_train = self.y_train.astype(int)
 		self.X_train, self.y_train = smote.fit_resample(self.X_train, self.y_train)
 
-		print(self.y_train.value_counts())
 		print("\nDepois do SMOTE:\n")
 		print(self.y_train.value_counts())
 

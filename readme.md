@@ -69,7 +69,7 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
   * **Destaques:** Identificação e correção de **Data Leakage** (isolamento de variáveis temporais). Implementação de Regressão Logística como **baseline**. Otimização de hardware focada na redução de dimensionalidade: transição de análise visual (Heatmap) para diagnóstico matemático com **VIF (Variance Inflation Factor)**, identificando redundância extrema (VIF > 500.000) em sensores de partículas. Redução da placa IoT de 12 para apenas 3 sensores (TVOC, Etanol e Pressão), mantendo a performance sob **Cross-Validation** rigorosa e **max_depth** controlado.
 * **[Previsão de Conversão em E-commerce](./intencao_compra)**
   * **Objetivo:** Prever a conversão de clientes no canal digital (compras web) baseando-se em perfil demográfico, histórico de consumo e comportamento multicanal.
-  * **Destaques:** Construção de um pipeline completo de dados com engenharia de features (agrupamento de categorias, *capping* de outliers, **One-Hot Encoding** e **Log Transformation**). Extração de **insights de negócio** focados no funil de conversão e comportamento *omnichannel* (loja física vs. online). Avaliação e comparação de múltiplos algoritmos para estabelecer um *baseline* interpretável, otimização do modelo via **RandomizedSearchCV**, atingindo um excelente *recall* de 95% para a classe compradora.
+  * **Destaques:** Construção de um fluxo completo de dados com engenharia de features (agrupamento de categorias, *capping* de outliers, **One-Hot Encoding** e **Log Transformation**). Extração de **insights de negócio** focados no funil de conversão e comportamento *omnichannel* (loja física vs. online). Avaliação e comparação de múltiplos algoritmos para estabelecer um *baseline* interpretável, otimização do modelo via **RandomizedSearchCV**, atingindo um excelente *recall* de 95% para a classe compradora.
 * **[XGBoost](./xgboost)**
   * **Objetivo:** Prever a probabilidade de um cliente comprar um veículo com base no perfil demográfico e financeiro.
   * **Destaques:** Extração e análise visual de **Probabilidades (`predict_proba`)** para tomada de decisão em negócios. Análise de **Feature Importance**. **Label Encoding**.
@@ -84,9 +84,3 @@ Instale as dependências do projeto listadas no arquivo `requirements.txt`. Esco
 * **[K-Means: Segmentação de Clientes](./segmentacao-clientes-kmeans)**
   * **Objetivo:** Segmentação da base de clientes de um shopping.
   * **Destaques:** Cruzamento final dos clusters com dados demográficos (gênero e idade). Análise profunda do perfil de cada grupo com foco em **estratégia comercial e negócios**.
-
----
-
-## ⏳ Em Breve (Na Fila de Desenvolvimento)
-* **Pipelines Completos (End-to-End):**
-  * +2 Projetos práticos completos, com a seleção do algoritmo ditada estritamente pela natureza da base de dados e do problema de negócio.
