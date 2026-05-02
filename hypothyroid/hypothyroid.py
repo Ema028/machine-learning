@@ -2,6 +2,7 @@ from utils.pre_processing import *
 from sklearn.tree import plot_tree, DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import cross_val_score, GridSearchCV
+import xgboost as xgb
 
 '''
 o objetivo desse modelo é diagnosticar e classificar pacientes
@@ -28,11 +29,11 @@ colunas_booleanas = ['on thyroxine', 'query on thyroxine', 'on antithyroid medic
                      'sick', 'pregnant', 'thyroid surgery', 'I131 treatment',
                      'query hypothyroid', 'query hyperthyroid', 'lithium',
                      'goitre', 'tumor', 'hypopituitary', 'psych']
-data.df[colunas_booleanas] = data.df[colunas_booleanas].replace({'f': 0, 't': 1})
-data.df['binaryClass'] = data.df['binaryClass'].replace({'N': 0, 'P': 1})
+data.df[colunas_booleanas] = data.df[colunas_booleanas].replace({'f': 0, 't': 1}).astype(int)
+data.df['binaryClass'] = data.df['binaryClass'].replace({'N': 0, 'P': 1}).astype(int)
 data.df['sex'] = data.df['sex'].replace({'?': np.nan, 'F': 0, 'M': 1}) #150 faltando(~4%)
 data.imputar_simples(['sex'], estrategia='most_frequent')
-data.df['binaryClass'] = data.df['binaryClass'].astype(int)
+data.df['sex'] = data.df['sex'].astype(int)
 
 print(data.df.describe().T) #sinais de outlier em 'age', 'TSH', 'TT4', 'FTI'
 data.box_plot_multi(['age', 'TSH', 'TT4', 'FTI'], "Antes de Tratar Outliers")
@@ -89,7 +90,7 @@ features_reduzidas = ['TSH', 'on thyroxine', 'TT4', 'FTI', 'thyroid surgery', 'q
 X_treino_red = data.X_train[features_reduzidas]
 X_teste_red = data.X_test[features_reduzidas]
 
-parametros_grid = {'criterion': ['gini', 'entropy'], 'max_depth': [3, 4, 5],
+parametros_grid = {'criterion': ['gini', 'entropy'], 'max_depth': [2, 3, 4],
                    'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 5, 10]}
 
 grid_search = GridSearchCV(DecisionTreeClassifier(random_state=0),
@@ -111,3 +112,25 @@ plt.title("Árvore de Decisão apenas com as features principais")
 plt.show()
 conf_matrix(data.y_test, pred_red, class_names)
 #taxa de positivos verdadeiros e falsos verdadeiros igual mais com 15 features a menos, acurácia também
+
+#modelo xgboost para classificação binária, vale o aumento de complexidade?
+modelo_xgb = xgb.XGBClassifier(learning_rate=0.1, max_depth=4,
+                               n_estimators=100, random_state=42, eval_metric='logloss')
+modelo_xgb.fit(data.X_train, data.y_train)
+
+previsoes = modelo_xgb.predict(data.X_test)
+prob = modelo_xgb.predict_proba(data.X_test)
+auc_roc(data.y_test, prob)
+df_resultados = pd.DataFrame({'Previsão': previsoes,
+                              'Probabilidade Doença': np.round(prob[:, 1] * 100, decimals= 2)})
+print(df_resultados.head())
+
+plt.figure(figsize=(12, 8))
+sns.histplot(df_resultados['Probabilidade Doença'], bins=30)
+plt.title('Distribuição de probabilidades de doença')
+plt.show()
+
+acuracia = accuracy_score(data.y_test, previsoes)
+print(f"\nAcurácia do Modelo XGBoost: {acuracia * 100:.2f}%\n")
+print(classification_report(data.y_test, previsoes))
+conf_matrix(data.y_test, previsoes, class_names)
