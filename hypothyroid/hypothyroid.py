@@ -1,8 +1,8 @@
 from utils.pre_processing import *
 from sklearn.tree import plot_tree, DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import cross_val_score, GridSearchCV
-import xgboost as xgb
+from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
+from xgboost import XGBClassifier
 
 '''
 o objetivo desse modelo é diagnosticar e classificar pacientes
@@ -20,7 +20,7 @@ data.drop_columns(['TBG', 'TSH measured', 'T3 measured', 'TT4 measured', 'T4U me
 #TBG falta tudo, não traz informação e colunas de measured só diz se foi feito exame
 #'referral source' estava causando ruído, dado admnistrativo
 data.df.dropna(subset=['age'], inplace=True) #só 1 linha sem idade, remover ela
-#poucos faltantes ~5%, knn imputer estava causando data leakage(substituia faltantes aprendendo valores da base toda), ao invés de colocar em um pipeline decidi usar simple imputer
+#poucos faltantes ~5%, knn imputer estava causando data leakage(substituia faltantes aprendendo valores da base toda), decidi usar simple imputer
 data.imputar_simples(['TSH', 'T3', 'TT4', 'T4U', 'FTI'])
 
 data.print_unique_values()
@@ -48,7 +48,7 @@ não precisam de escalonamento(por isso std scaler não usada)'''
 data.heatmap() #binaryClass têm forte correlação negativa com tsh(-0.69)
 data.separar_base('binaryClass')
 verificar_base(data.X_train, data.X_test, data.y_train, data.y_test, 'binaryClass')
-#base muito desbalanceada, oversampling
+#base muito desbalanceada, doenças da tireoide são raras (apenas 6.75% na base de teste), treinar o modelo a não ignorar a minoria com oversampling
 data.smote()
 
 #decision tree como modelo baseline
@@ -112,14 +112,22 @@ plt.title("Árvore de Decisão apenas com as features principais")
 plt.show()
 conf_matrix(data.y_test, pred_red, class_names)
 #taxa de positivos verdadeiros e falsos verdadeiros igual mais com 15 features a menos, acurácia também
+'''modelo provou matematicamente que usar apenas 6 features chave gera o mesmo resultado que 21 variáveis,
+o que significa, redução de custos laboratoriais, menos formulários e um diagnóstico mais rápido'''
 
 #modelo xgboost para classificação binária, vale o aumento de complexidade?
-modelo_xgb = xgb.XGBClassifier(learning_rate=0.1, max_depth=4,
-                               n_estimators=100, random_state=42, eval_metric='logloss')
-modelo_xgb.fit(data.X_train, data.y_train)
+parametros_random = {'learning_rate': [0.01, 0.05, 0.1, 0.2], 'max_depth': [3, 4, 5, 6],
+                     'n_estimators': [50, 100, 200, 300], 'subsample': [0.8, 0.9, 1.0], 'colsample_bytree': [0.8, 0.9, 1.0]}
 
-previsoes = modelo_xgb.predict(data.X_test)
-prob = modelo_xgb.predict_proba(data.X_test)
+random_search = RandomizedSearchCV(XGBClassifier(random_state=0),
+                                       param_distributions=parametros_random, n_iter=20, cv=5,
+                                       scoring='accuracy', n_jobs=-1,  random_state=42)
+
+random_search.fit(X_treino_red, data.y_train)
+modelo_xgb = random_search.best_estimator_
+
+previsoes = modelo_xgb.predict(X_teste_red)
+prob = modelo_xgb.predict_proba(X_teste_red)
 auc_roc(data.y_test, prob)
 df_resultados = pd.DataFrame({'Previsão': previsoes,
                               'Probabilidade Doença': np.round(prob[:, 1] * 100, decimals= 2)})
@@ -129,8 +137,15 @@ plt.figure(figsize=(12, 8))
 sns.histplot(df_resultados['Probabilidade Doença'], bins=30)
 plt.title('Distribuição de probabilidades de doença')
 plt.show()
+'''modelo atinge ~99.9% de certeza nos diagnósticos positivos
+se a chance cair na faixa de 40% a 60%, o sistema poderia acionar uma revisão médica manual'''
+
 
 acuracia = accuracy_score(data.y_test, previsoes)
 print(f"\nAcurácia do Modelo XGBoost: {acuracia * 100:.2f}%\n")
 print(classification_report(data.y_test, previsoes))
 conf_matrix(data.y_test, previsoes, class_names)
+
+data.feature_importance(modelo_xgb, colunas=X_teste_red.columns) #TSH tem ~80% de influência sozinho
+'''árvore venceu na acurácia por uma margem mínima (99.47% vs 99.34%), mas concentra 95% da decisão só no TSH 
+XGBoost reduziu a dependência para ~80% e passou a considerar mais o histórico do paciente ('on thyroxine' com 12.5%)'''

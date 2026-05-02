@@ -205,9 +205,11 @@ class Dataframe:
 		vif_df["VIF"] = [variance_inflation_factor(X_const.values, i) for i in range(X_const.shape[1])]
 		return vif_df[vif_df["Variável"] != 'const'].sort_values(by="VIF", ascending=False).reset_index(drop=True)
 
-	def feature_importance(self, modelo):
+	def feature_importance(self, modelo, colunas=None):
+		if colunas is None:
+			colunas = self.X_train.columns
 		importancias = modelo.feature_importances_
-		df_importancia = pd.DataFrame({'Feature': self.X_train.columns, 'Importancia': importancias})
+		df_importancia = pd.DataFrame({'Feature': colunas, 'Importancia': importancias})
 		df_importancia = df_importancia.sort_values(by='Importancia', ascending=False).reset_index(drop=True)
 		df_importancia['Importancia (%)'] = (
 					df_importancia['Importancia'] / df_importancia['Importancia'].sum() * 100).round(2)
