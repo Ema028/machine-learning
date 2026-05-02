@@ -175,6 +175,7 @@ class Dataframe:
 
 	def smote(self):
 		smote = SMOTE(random_state=42)
+		self.y_train = self.y_train.astype(int)
 		self.X_train, self.y_train = smote.fit_resample(self.X_train, self.y_train)
 
 		print(self.y_train.value_counts())
@@ -204,6 +205,15 @@ class Dataframe:
 		vif_df["Variável"] = X_const.columns
 		vif_df["VIF"] = [variance_inflation_factor(X_const.values, i) for i in range(X_const.shape[1])]
 		return vif_df[vif_df["Variável"] != 'const'].sort_values(by="VIF", ascending=False).reset_index(drop=True)
+
+	def feature_importance(self, modelo):
+		importancias = modelo.feature_importances_
+		df_importancia = pd.DataFrame({'Feature': self.X_train.columns, 'Importancia': importancias})
+		df_importancia = df_importancia.sort_values(by='Importancia', ascending=False).reset_index(drop=True)
+		df_importancia['Importancia (%)'] = (
+					df_importancia['Importancia'] / df_importancia['Importancia'].sum() * 100).round(2)
+		print(df_importancia)
+		return df_importancia
 
 def conf_matrix(y_test, previsoes, class_names):
 	plt.figure(figsize=(8, 6))
